@@ -1,33 +1,38 @@
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:7: error: C2027: use of undefined type 'Ui::LoginWindow'
-..\..\LoginWindow.cpp(7): error C2027: use of undefined type 'Ui::LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
+#include "carlistview.h"
+#include "ui_carlistview.h"
 
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:9: error: C2027: use of undefined type 'Ui::LoginWindow'
-..\..\LoginWindow.cpp(9): error C2027: use of undefined type 'Ui::LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
+CarListView::CarListView(QWidget *parent)
+    : QWidget(parent),
+      ui(new Ui::CarListView)
+{
+    ui->setupUi(this);
+    loadCars();
+}
 
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:14: warning: C4150: deletion of pointer to incomplete type 'Ui::LoginWindow'; no destructor called
-..\..\LoginWindow.cpp(14): warning C4150: deletion of pointer to incomplete type 'Ui::LoginWindow'; no destructor called
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
+CarListView::~CarListView()
+{
+    delete ui;
+}
 
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:20: error: C2027: use of undefined type 'Ui::LoginWindow'
-..\..\LoginWindow.cpp(20): error C2027: use of undefined type 'Ui::LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
+void CarListView::loadCars()
+{
+    ui->carTable->setRowCount(3);
 
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:22: error: C2027: use of undefined type 'Ui::LoginWindow'
-..\..\LoginWindow.cpp(22): error C2027: use of undefined type 'Ui::LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
+    ui->carTable->setItem(0, 0, new QTableWidgetItem("1"));
+    ui->carTable->setItem(0, 1, new QTableWidgetItem("Toyota"));
+    ui->carTable->setItem(0, 2, new QTableWidgetItem("Sedan"));
+    ui->carTable->setItem(0, 3, new QTableWidgetItem("50"));
+    ui->carTable->setItem(0, 4, new QTableWidgetItem("Available"));
 
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:26: error: C2027: use of undefined type 'Ui::LoginWindow'
-..\..\LoginWindow.cpp(26): error C2027: use of undefined type 'Ui::LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
+    ui->carTable->setItem(1, 0, new QTableWidgetItem("2"));
+    ui->carTable->setItem(1, 1, new QTableWidgetItem("BMW"));
+    ui->carTable->setItem(1, 2, new QTableWidgetItem("SUV"));
+    ui->carTable->setItem(1, 3, new QTableWidgetItem("90"));
+    ui->carTable->setItem(1, 4, new QTableWidgetItem("Rented"));
 
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:37: error: C2027: use of undefined type 'Ui::LoginWindow'
-..\..\LoginWindow.cpp(37): error C2027: use of undefined type 'Ui::LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(8): note: see declaration of 'Ui::LoginWindow'
-
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:41: error: C2039: 'on_register_clicked': is not a member of 'LoginWindow'
-..\..\LoginWindow.cpp(41): error C2039: 'on_register_clicked': is not a member of 'LoginWindow'
-D:\sara\DS\CarRentalCustomer\LoginWindow.h(12): note: see declaration of 'LoginWindow'
-
-D:\sara\DS\CarRentalCustomer\LoginWindow.cpp:43: error: C2355: 'this': can only be referenced inside non-static member functions or non-static data member initializers
+    ui->carTable->setItem(2, 0, new QTableWidgetItem("3"));
+    ui->carTable->setItem(2, 1, new QTableWidgetItem("Kia"));
+    ui->carTable->setItem(2, 2, new QTableWidgetItem("Hatchback"));
+    ui->carTable->setItem(2, 3, new QTableWidgetItem("40"));
+    ui->carTable->setItem(2, 4, new QTableWidgetItem("Available"));
+}
