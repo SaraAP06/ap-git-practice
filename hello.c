@@ -1,19 +1,66 @@
-int row = ui->carTable->currentRow();
+#include "reservationview.h"
+#include "ui_reservationview.h"
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QCoreApplication>
 
-    if (row < 0) {
-        QMessageBox::warning(this, "Error", "Please select a car");
+ReservationView::ReservationView(QString carId,
+                                 QString brand,
+                                 QWidget *parent)
+    : QWidget(parent),
+      ui(new Ui::ReservationView),
+      carId(carId)
+{
+    ui->setupUi(this);
+    ui->carInfoLabel->setText("Selected Car: " + brand);
+
+    ui->startDateEdit->setDate(QDate::currentDate());
+    ui->endDateEdit->setDate(QDate::currentDate().addDays(1));
+}
+
+ReservationView::~ReservationView()
+{
+    delete ui;
+}
+
+void ReservationView::on_confirmButton_clicked()
+{
+    QDate start = ui->startDateEdit->date();
+    QDate end = ui->endDateEdit->date();
+
+    if (end <= start) {
+        QMessageBox::warning(this, "Error",
+                             "End date must be after start date");
         return;
     }
 
-    QString status = ui->carTable->item(row, 4)->text();
-    if (status != "Available") {
-        QMessageBox::warning(this, "Error", "Car is not available");
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/reservations.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "Could not save reservation");
         return;
     }
 
-    QString carId = ui->carTable->item(row, 0)->text();
-    QString brand = ui->carTable->item(row, 1)->text();
+    QTextStream out(&file);
 
-    ReservationView *view = new ReservationView(carId, brand);
-    view->show();
+    // فرمت:
+    // customerId,carId,startDate,endDate,status
+    out << "1," << carId << ","
+        << start.toString("yyyy-MM-dd") << ","
+        << end.toString("yyyy-MM-dd") << ",Pending\n";
+
+    file.close();
+
+    QMessageBox::information(this, "Done",
+                             "Reservation request submitted");
+    close();
+}
+
+void ReservationView::on_cancelButton_clicked()
+{
+    close();
 }
