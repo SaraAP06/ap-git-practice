@@ -1,3 +1,47 @@
-moc_paymentview.obj:-1: error: LNK2019: unresolved external symbol "private: void __cdecl paymentView::on_backPushButton_clicked(void)" (?on_backPushButton_clicked@paymentView@@AEAAXXZ) referenced in function "public: virtual int __cdecl paymentView::qt_metacall(enum QMetaObject::Call,int,void * *)" (?qt_metacall@paymentView@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z)
+void paymentView::loadPayments()
+{
+    QString path = QCoreApplication::applicationDirPath()
+    + "/payments.txt";
+    QFile file(path);
 
-  D:\sara\DS\CarRentalCustomer\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\debug\CarRentalCustomer.exe:-1: error: LNK1120: 1 unresolved externals
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "Could not open payments file");
+        return;
+    }
+
+    QTextStream in(&file);
+    int row = 0;
+
+    ui->paymentTableWidget->setRowCount(0);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 4)
+            continue;
+
+        //if (parts[0] != "1")
+           // continue;
+
+        ui->paymentTableWidget->insertRow(row);
+
+        ui->paymentTableWidget->setItem(row, 0,
+                                  new QTableWidgetItem(parts[1]));
+        ui->paymentTableWidget->setItem(row, 1,
+                                  new QTableWidgetItem(parts[2]));
+        ui->paymentTableWidget->setItem(row, 2,
+                                  new QTableWidgetItem(parts[3]));
+
+        row++;
+    }
+
+    file.close();
+}
+
+
+
+
+1,3,120,Unpaid
+1,1,50,Paid
