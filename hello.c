@@ -1,25 +1,16 @@
-void PaymentView::on_payButton_clicked()
-{
-    int row = ui->paymentTable->currentRow();
+در مورد روابط دختر و پسر، قبل از ازدواج کدام جمله صحیح ترین است؟
+Question 5Answer
 
-    if (row < 0) {
-        QMessageBox::warning(this, "Error",
-                             "Select a payment first");
-        return;
-    }
+a.
+مکتوب شدن قرار داد ازدواج، هیچ تأثیری در روند به دست آوردن حق ندارد.
 
-    QString status = ui->paymentTable
-                     ->item(row, 2)->text();
 
-    if (status == "Paid") {
-        QMessageBox::information(this, "Info",
-                                 "Already paid");
-        return;
-    }
+b.
+در ادیان آسمانی روابط دختر و پسر به طور کلی نهی شده است
 
-    QMessageBox::information(this, "Payment",
-                             "Payment successful");
+c.
+کشش عاطفی و جنسی دختر و پسر باعث نگرش عقلانی و حکیمانه آنها به ازدواج می شود.
 
-    ui->paymentTable->setItem(row, 2,
-        new QTableWidgetItem("Paid"));
-}
+
+d.
+در روابط بدون چارچوب پیش از ازدواج تعهدی بین طرفین وجود ندارد و آنها به راحتی به هم آسیب می زنند.
