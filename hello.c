@@ -1,18 +1,3 @@
-زن اگر ناشزه شد با توجه به توصیه هایی که در اسلام در مورد نحوه برخورد با او شده است کدام گزینه نادرست است؟
+moc_paymentview.obj:-1: error: LNK2019: unresolved external symbol "private: void __cdecl paymentView::on_backPushButton_clicked(void)" (?on_backPushButton_clicked@paymentView@@AEAAXXZ) referenced in function "public: virtual int __cdecl paymentView::qt_metacall(enum QMetaObject::Call,int,void * *)" (?qt_metacall@paymentView@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z)
 
-Question 13Answer
-
-a.
-به دلیل نا روا بودن عمل او باید به قصد کشت اورا زد
-
-
-b.
-باید از او خواست که کار خود را ترک کند
-
-
-c.
-باید از او در رختخواب همسرش دوری کند  
-
-
-d.
-او را کوتاه و مختصر تنبیه کند
+  D:\sara\DS\CarRentalCustomer\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\debug\CarRentalCustomer.exe:-1: error: LNK1120: 1 unresolved externals
