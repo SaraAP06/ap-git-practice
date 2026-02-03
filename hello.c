@@ -1,50 +1,36 @@
-void paymentView::loadPayments()
+void CarListView::loadCarsFromFile()
 {
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/payments.txt";
+    QString path = QCoreApplication::applicationDirPath() + "/cars.txt";
     QFile file(path);
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Error",
-                             "Could not open payments file");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
-    }
-
-    // 🔴 ست کامل جدول
-    ui->paymentTableWidget->clear();
-    ui->paymentTableWidget->setRowCount(0);
-    ui->paymentTableWidget->setColumnCount(4);
-
-    QStringList headers;
-    headers << "Customer ID" << "Car ID" << "Amount" << "Status";
-    ui->paymentTableWidget->setHorizontalHeaderLabels(headers);
 
     QTextStream in(&file);
-    int row = 0;
+    allCars.clear();
 
     while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty())
-            continue;
-
+        QString line = in.readLine();
         QStringList parts = line.split(",");
-        if (parts.size() != 4)
-            continue;
-
-        ui->paymentTableWidget->insertRow(row);
-
-        for (int col = 0; col < 4; col++) {
-            ui->paymentTableWidget->setItem(
-                row,
-                col,
-                new QTableWidgetItem(parts[col])
-            );
-        }
-
-        row++;
+        if (parts.size() == 5)
+            allCars.append(parts);
     }
-
     file.close();
 
-    ui->paymentTableWidget->resizeColumnsToContents();
+    showCars(allCars);
+}
+
+
+
+void CarListView::showCars(const QList<QStringList>& cars)
+{
+    ui->carTable->setRowCount(0);
+
+    for (int i = 0; i < cars.size(); i++) {
+        ui->carTable->insertRow(i);
+        for (int j = 0; j < 5; j++) {
+            ui->carTable->setItem(i, j,
+                new QTableWidgetItem(cars[i][j]));
+        }
+    }
 }
