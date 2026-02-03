@@ -1,28 +1,7 @@
-#include "paymentview.h"
-#include "ui_paymentview.h"
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QMessageBox>
-#include <QCoreApplication>
-
-paymentView::paymentView(QWidget *parent)
-    : QWidget(parent),
-    ui(new Ui::paymentView)
-{
-    ui->setupUi(this);
-    loadPayments();
-}
-
-paymentView::~paymentView()
-{
-    delete ui;
-}
-
 void paymentView::loadPayments()
 {
     QString path = QCoreApplication::applicationDirPath()
-    + "/payments.txt";
+                   + "/payments.txt";
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -31,10 +10,18 @@ void paymentView::loadPayments()
         return;
     }
 
-    QTextStream in(&file);
+    // 🔴 ست کامل جدول
+    ui->paymentTableWidget->clear();
     ui->paymentTableWidget->setRowCount(0);
+    ui->paymentTableWidget->setColumnCount(4);
 
+    QStringList headers;
+    headers << "Customer ID" << "Car ID" << "Amount" << "Status";
+    ui->paymentTableWidget->setHorizontalHeaderLabels(headers);
+
+    QTextStream in(&file);
     int row = 0;
+
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         if (line.isEmpty())
@@ -51,43 +38,13 @@ void paymentView::loadPayments()
                 row,
                 col,
                 new QTableWidgetItem(parts[col])
-                );
+            );
         }
+
         row++;
     }
 
     file.close();
+
+    ui->paymentTableWidget->resizeColumnsToContents();
 }
-
-void paymentView::on_payPushButton_clicked()
-{
-    int row = ui->paymentTableWidget->currentRow();
-
-    if (row < 0) {
-        QMessageBox::warning(this, "Error",
-                             "Select a payment first");
-        return;
-    }
-
-    QString status = ui->paymentTableWidget
-                         ->item(row, 2)->text();
-
-    if (status == "Paid") {
-        QMessageBox::information(this, "Info",
-                                 "Already paid");
-        return;
-    }
-
-    QMessageBox::information(this, "Payment",
-                             "Payment successful");
-
-    ui->paymentTableWidget->setItem(row, 2,
-                              new QTableWidgetItem("Paid"));
-}
-
-void paymentView::on_backPushButton_clicked()
-{
-
-}
-
-
