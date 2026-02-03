@@ -1,36 +1,28 @@
-void CarListView::loadCarsFromFile()
+void CarListView::on_filterButton_clicked()
 {
-    QString path = QCoreApplication::applicationDirPath() + "/cars.txt";
-    QFile file(path);
+    QString brand = ui->brandLineEdit->text().toLower();
+    QString type = ui->typeLineEdit->text().toLower();
+    QString maxPriceText = ui->maxPriceLineEdit->text();
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    QList<QStringList> filtered;
 
-    QTextStream in(&file);
-    allCars.clear();
+    for (int i = 0; i < allCars.size(); i++) {
+        QStringList car = allCars[i];
 
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
-        if (parts.size() == 5)
-            allCars.append(parts);
+        if (!brand.isEmpty() &&
+            !car[1].toLower().contains(brand))
+            continue;
+
+        if (!type.isEmpty() &&
+            !car[2].toLower().contains(type))
+            continue;
+
+        if (!maxPriceText.isEmpty() &&
+            car[3].toInt() > maxPriceText.toInt())
+            continue;
+
+        filtered.append(car);
     }
-    file.close();
 
-    showCars(allCars);
-}
-
-
-
-void CarListView::showCars(const QList<QStringList>& cars)
-{
-    ui->carTable->setRowCount(0);
-
-    for (int i = 0; i < cars.size(); i++) {
-        ui->carTable->insertRow(i);
-        for (int j = 0; j < 5; j++) {
-            ui->carTable->setItem(i, j,
-                new QTableWidgetItem(cars[i][j]));
-        }
-    }
+    showCars(filtered);
 }
