@@ -1,66 +1,62 @@
-#include "reservationview.h"
-#include "ui_reservationview.h"
+#include "myreservationsview.h"
+#include "ui_myreservationsview.h"
 #include <QFile>
 #include <QTextStream>
+#include <QStringList>
 #include <QMessageBox>
 #include <QCoreApplication>
 
-ReservationView::ReservationView(QString carId,
-                                 QString brand,
-                                 QWidget *parent)
+MyReservationsView::MyReservationsView(QWidget *parent)
     : QWidget(parent),
-      ui(new Ui::ReservationView),
-      carId(carId)
+      ui(new Ui::MyReservationsView)
 {
     ui->setupUi(this);
-    ui->carInfoLabel->setText("Selected Car: " + brand);
-
-    ui->startDateEdit->setDate(QDate::currentDate());
-    ui->endDateEdit->setDate(QDate::currentDate().addDays(1));
+    loadReservations();
 }
 
-ReservationView::~ReservationView()
+MyReservationsView::~MyReservationsView()
 {
     delete ui;
 }
 
-void ReservationView::on_confirmButton_clicked()
+void MyReservationsView::loadReservations()
 {
-    QDate start = ui->startDateEdit->date();
-    QDate end = ui->endDateEdit->date();
-
-    if (end <= start) {
-        QMessageBox::warning(this, "Error",
-                             "End date must be after start date");
-        return;
-    }
-
     QString path = QCoreApplication::applicationDirPath()
                    + "/reservations.txt";
     QFile file(path);
 
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::warning(this, "Error",
-                             "Could not save reservation");
+                             "Could not open reservations file");
         return;
     }
 
-    QTextStream out(&file);
+    QTextStream in(&file);
+    int row = 0;
 
-    // فرمت:
-    // customerId,carId,startDate,endDate,status
-    out << "1," << carId << ","
-        << start.toString("yyyy-MM-dd") << ","
-        << end.toString("yyyy-MM-dd") << ",Pending\n";
+    ui->reservationTable->setRowCount(0);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 5)
+            continue;
+
+        // فقط رزروهای customer فعلی
+        if (parts[0] != "1")
+            continue;
+
+        ui->reservationTable->insertRow(row);
+
+        for (int col = 0; col < 5; col++) {
+            ui->reservationTable->setItem(
+                row, col,
+                new QTableWidgetItem(parts[col])
+            );
+        }
+        row++;
+    }
 
     file.close();
-
-    QMessageBox::information(this, "Done",
-                             "Reservation request submitted");
-    close();
-}
-
-void ReservationView::on_cancelButton_clicked()
-{
-    close();
 }
