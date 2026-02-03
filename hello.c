@@ -1,60 +1,60 @@
-#include "myreservationsview.h"
-#include "ui_myreservationsview.h"
+#include "paymentview.h"
+#include "ui_paymentview.h"
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
 #include <QMessageBox>
 #include <QCoreApplication>
 
-MyReservationsView::MyReservationsView(QWidget *parent)
+PaymentView::PaymentView(QWidget *parent)
     : QWidget(parent),
-      ui(new Ui::MyReservationsView)
+      ui(new Ui::PaymentView)
 {
     ui->setupUi(this);
-    loadReservations();
+    loadPayments();
 }
 
-MyReservationsView::~MyReservationsView()
+PaymentView::~PaymentView()
 {
     delete ui;
 }
 
-void MyReservationsView::loadReservations()
+void PaymentView::loadPayments()
 {
     QString path = QCoreApplication::applicationDirPath()
-                   + "/reservations.txt";
+                   + "/payments.txt";
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::warning(this, "Error",
-                             "Could not open reservations file");
+                             "Could not open payments file");
         return;
     }
 
     QTextStream in(&file);
     int row = 0;
 
-    ui->reservationTable->setRowCount(0);
+    ui->paymentTable->setRowCount(0);
 
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList parts = line.split(",");
 
-        if (parts.size() != 5)
+        if (parts.size() != 4)
             continue;
 
-        // فقط رزروهای customer فعلی
         if (parts[0] != "1")
             continue;
 
-        ui->reservationTable->insertRow(row);
+        ui->paymentTable->insertRow(row);
 
-        for (int col = 0; col < 5; col++) {
-            ui->reservationTable->setItem(
-                row, col,
-                new QTableWidgetItem(parts[col])
-            );
-        }
+        ui->paymentTable->setItem(row, 0,
+            new QTableWidgetItem(parts[1]));
+        ui->paymentTable->setItem(row, 1,
+            new QTableWidgetItem(parts[2]));
+        ui->paymentTable->setItem(row, 2,
+            new QTableWidgetItem(parts[3]));
+
         row++;
     }
 
