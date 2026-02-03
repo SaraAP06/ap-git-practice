@@ -1,7 +1,28 @@
+#include "paymentview.h"
+#include "ui_paymentview.h"
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QMessageBox>
+#include <QCoreApplication>
+
+paymentView::paymentView(QWidget *parent)
+    : QWidget(parent),
+    ui(new Ui::paymentView)
+{
+    ui->setupUi(this);
+    loadPayments();
+}
+
+paymentView::~paymentView()
+{
+    delete ui;
+}
+
 void paymentView::loadPayments()
 {
     QString path = QCoreApplication::applicationDirPath()
-                   + "/payments.txt";
+    + "/payments.txt";
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -11,36 +32,62 @@ void paymentView::loadPayments()
     }
 
     QTextStream in(&file);
-    int row = 0;
-
     ui->paymentTableWidget->setRowCount(0);
-    ui->paymentTableWidget->setColumnCount(3);
 
-    QStringList headers;
-    headers << "Car ID" << "Amount" << "Status";
-    ui->paymentTableWidget->setHorizontalHeaderLabels(headers);
-
+    int row = 0;
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         if (line.isEmpty())
             continue;
 
         QStringList parts = line.split(",");
-
         if (parts.size() != 4)
             continue;
 
         ui->paymentTableWidget->insertRow(row);
 
-        ui->paymentTableWidget->setItem(row, 0,
-            new QTableWidgetItem(parts[1]));
-        ui->paymentTableWidget->setItem(row, 1,
-            new QTableWidgetItem(parts[2]));
-        ui->paymentTableWidget->setItem(row, 2,
-            new QTableWidgetItem(parts[3]));
-
+        for (int col = 0; col < 4; col++) {
+            ui->paymentTableWidget->setItem(
+                row,
+                col,
+                new QTableWidgetItem(parts[col])
+                );
+        }
         row++;
     }
 
     file.close();
 }
+
+void paymentView::on_payPushButton_clicked()
+{
+    int row = ui->paymentTableWidget->currentRow();
+
+    if (row < 0) {
+        QMessageBox::warning(this, "Error",
+                             "Select a payment first");
+        return;
+    }
+
+    QString status = ui->paymentTableWidget
+                         ->item(row, 2)->text();
+
+    if (status == "Paid") {
+        QMessageBox::information(this, "Info",
+                                 "Already paid");
+        return;
+    }
+
+    QMessageBox::information(this, "Payment",
+                             "Payment successful");
+
+    ui->paymentTableWidget->setItem(row, 2,
+                              new QTableWidgetItem("Paid"));
+}
+
+void paymentView::on_backPushButton_clicked()
+{
+
+}
+
+
