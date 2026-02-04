@@ -1,71 +1,19 @@
-#include "extensionview.h"
-#include "ui_extensionview.h"
-#include <QFile>
-#include <QTextStream>
-#include <QMessageBox>
-#include <QCoreApplication>
-#include <QDate>
-
-ExtensionView::ExtensionView(QString carId,
-                             QString oldEndDate,
-                             QWidget *parent)
-    : QWidget(parent),
-      ui(new Ui::ExtensionView),
-      carId(carId),
-      oldEndDate(oldEndDate)
+void MyReservationsView::on_extensionButton_clicked()
 {
-    ui->setupUi(this);
-    ui->infoLabel->setText(
-        "Car ID: " + carId + "\nCurrent End: " + oldEndDate
-    );
+    int row = ui->reservationTable->currentRow();
 
-    ui->newEndDateEdit->setDate(
-        QDate::fromString(oldEndDate, "yyyy-MM-dd").addDays(1)
-    );
-}
-
-ExtensionView::~ExtensionView()
-{
-    delete ui;
-}
-
-void ExtensionView::on_submitButton_clicked()
-{
-    QDate newDate = ui->newEndDateEdit->date();
-    QDate oldDate = QDate::fromString(oldEndDate, "yyyy-MM-dd");
-
-    if (newDate <= oldDate) {
+    if (row < 0) {
         QMessageBox::warning(this, "Error",
-            "New date must be after current end date");
+            "Select a reservation first");
         return;
     }
 
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/extensions.txt";
-    QFile file(path);
+    QString carId =
+        ui->reservationTable->item(row, 1)->text();
+    QString endDate =
+        ui->reservationTable->item(row, 3)->text();
 
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
-        QMessageBox::warning(this, "Error",
-            "Could not save extension request");
-        return;
-    }
-
-    QTextStream out(&file);
-
-    out << "1," << carId << ","
-        << oldEndDate << ","
-        << newDate.toString("yyyy-MM-dd")
-        << ",Pending\n";
-
-    file.close();
-
-    QMessageBox::information(this, "Done",
-        "Extension request submitted");
-
-    close();
-}
-
-void ExtensionView::on_cancelButton_clicked()
-{
-    close();
+    ExtensionView *view =
+        new ExtensionView(carId, endDate);
+    view->show();
 }
