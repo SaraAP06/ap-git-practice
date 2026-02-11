@@ -1,15 +1,39 @@
-int id = -1;
-
-while (!in.atEnd()) {
-    QString line = in.readLine();
-    QStringList parts = line.split(",");
-
-    if (parts.size() < 4)
-        continue;
-
-    if (parts[1] == username && parts[2] == password) {
-        found = true;
-        id = parts[0].toInt();
-        break;
+void myReservationsView::on_cancelReservationPushButton_clicked()
+{
+    int row = ui->reservationTableWidget->currentRow();
+    if(row < 0){
+        QMessageBox::warning(this,"Error","Select a reservation first");
+        return;
     }
+
+    QString resId = ui->reservationTableWidget->item(row,0)->text(); // یا carId+startDate
+    QString path = QCoreApplication::applicationDirPath() + "/reservations.txt";
+    QFile file(path);
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(this,"Error","Could not open reservations file");
+        return;
+    }
+
+    QTextStream in(&file);
+    QStringList lines;
+    while(!in.atEnd()){
+        QString line = in.readLine();
+        if(!line.contains(resId)) // رزرو مورد نظر رو حذف می‌کنیم
+            lines.append(line);
+    }
+    file.close();
+
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        QMessageBox::warning(this,"Error","Could not write reservations file");
+        return;
+    }
+
+    QTextStream out(&file);
+    for(const QString &l : lines)
+        out << l << "\n";
+    file.close();
+
+    QMessageBox::information(this,"Done","Reservation cancelled");
+    loadReservations();
 }
