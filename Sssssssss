@@ -1,206 +1,117 @@
-#ifndef RESERVATION_H
-#define RESERVATION_H
-
-#include <QString>
-#include <QDate>
-
-class Reservation
+void updateCarStatus(const QString &carId)
 {
-public:
-    QString id;
-    QString username;
-    QString carId;
+    QString path = QCoreApplication::applicationDirPath() + "/cars.txt";
+    QFile file(path);
 
-    QDate startDate;
-    QDate endDate;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
 
-    QString status;        // Pending, Approved, Rejected, Rented, Finished
-    QString paymentStatus; // Unpaid, Paid
+    QStringList lines;
+    QTextStream in(&file);
 
-    bool extensionRequested;
+    while (!in.atEnd())
+        lines.append(in.readLine());
 
-    Reservation();
+    file.close();
 
-    QString toFileString() const;
-    static Reservation fromFileString(QString line);
-};
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
 
-#endif
+    QTextStream out(&file);
 
-
-
-
-
-
-#include "Reservation.h"
-
-Reservation::Reservation()
-{
-    extensionRequested = false;
-}
-
-QString Reservation::toFileString() const
-{
-    return id + "," +
-           username + "," +
-           carId + "," +
-           startDate.toString("yyyy-MM-dd") + "," +
-           endDate.toString("yyyy-MM-dd") + "," +
-           status + "," +
-           paymentStatus + "," +
-           (extensionRequested ? "1" : "0");
-}
-
-Reservation Reservation::fromFileString(QString line)
-{
-    Reservation r;
-    QStringList parts = line.split(",");
-
-    if(parts.size() >= 8)
+    for (int i = 0; i < lines.size(); i++)
     {
-        r.id = parts[0];
-        r.username = parts[1];
-        r.carId = parts[2];
-        r.startDate = QDate::fromString(parts[3], "yyyy-MM-dd");
-        r.endDate = QDate::fromString(parts[4], "yyyy-MM-dd");
-        r.status = parts[5];
-        r.paymentStatus = parts[6];
-        r.extensionRequested = (parts[7] == "1");
+        QStringList parts = lines[i].split(",");
+
+        if (parts.size() == 5 && parts[0] == carId)
+            parts[4] = "Reserved";
+
+        out << parts.join(",") << "\n";
     }
 
-    return r;
+    file.close();
 }
 
 
 
 
 
-
-
-
-bool CarManager::isCarAvailable(QString carId)
+void createPayment(const QString &carId)
 {
-    loadCars();
+    QString carPath = QCoreApplication::applicationDirPath() + "/cars.txt";
+    QFile carFile(carPath);
 
-    for(const Car &c : cars)
+    if (!carFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&carFile);
+    int price = 0;
+
+    while (!in.atEnd())
     {
-        if(c.id == carId)
+        QStringList parts = in.readLine().split(",");
+        if (parts.size() == 5 && parts[0] == carId)
         {
-            return (c.status == "Available");
+            price = parts[3].toInt();
+            break;
         }
     }
 
-    return false;
+    carFile.close();
+
+    QString payPath = QCoreApplication::applicationDirPath() + "/payments.txt";
+    QFile payFile(payPath);
+
+    if (!payFile.open(QIODevice::Append | QIODevice::Text))
+        return;
+
+    QTextStream out(&payFile);
+    out << "1," << carId << "," << price << ",Unpaid\n";
+
+    payFile.close();
 }
 
 
 
 
 
-
-
-
-bool ReservationManager::createReservation(QString username, QString carId, QDate start, QDate end)
+void reservationView::on_confirmPushButton_clicked()
 {
-    if(!carManager->isCarAvailable(carId))
-        return false;
+    QDate start = ui->startDateEdit->date();
+    QDate end = ui->endDateEdit->date();
 
-    Reservation r;
-    r.id = QString::number(QDateTime::currentSecsSinceEpoch());
-    r.username = username;
-    r.carId = carId;
-    r.startDate = start;
-    r.endDate = end;
-    r.status = "Pending";
-    r.paymentStatus = "Unpaid";
-    r.extensionRequested = false;
-
-    reservations.append(r);
-    saveReservations();
-
-    carManager->changeCarStatus(carId, "Reserved");
-
-    return true;
-}
-
-
-
-
-
-
-
-bool ReservationManager::payReservation(QString reservationId)
-{
-    for(Reservation &r : reservations)
-    {
-        if(r.id == reservationId && r.paymentStatus == "Unpaid")
-        {
-            r.paymentStatus = "Paid";
-
-            if(r.status == "Approved")
-                r.status = "Rented";
-
-            saveReservations();
-
-            carManager->changeCarStatus(r.carId, "Rented");
-
-            return true;
-        }
+    if (end <= start) {
+        QMessageBox::warning(this, "Error",
+                             "End date must be after start date");
+        return;
     }
 
-    return false;
-}bool ReservationManager::payReservation(QString reservationId)
-{
-    for(Reservation &r : reservations)
-    {
-        if(r.id == reservationId && r.paymentStatus == "Unpaid")
-        {
-            r.paymentStatus = "Paid";
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/reservations.txt";
+    QFile file(path);
 
-            if(r.status == "Approved")
-                r.status = "Rented";
-
-            saveReservations();
-
-            carManager->changeCarStatus(r.carId, "Rented");
-
-            return true;
-        }
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "Could not save reservation");
+        return;
     }
 
-    return false;
+    QTextStream out(&file);
+
+    out << "1," << carId << ","
+        << start.toString("yyyy-MM-dd") << ","
+        << end.toString("yyyy-MM-dd") << ",Pending\n";
+
+    file.close();
+
+    // تغییر وضعیت ماشین
+    updateCarStatus(carId);
+
+    // ساخت Payment
+    createPayment(carId);
+
+    QMessageBox::information(this, "Done",
+                             "Reservation submitted & Car reserved");
+
+    close();
 }
-
-
-
-
-
-
-
-
-
-bool ReservationManager::requestExtension(QString reservationId)
-{
-    for(Reservation &r : reservations)
-    {
-        if(r.id == reservationId && r.status == "Rented")
-        {
-            r.extensionRequested = true;
-            saveReservations();
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-
-
-
-
-
-
-QString ext = r.extensionRequested ? "Yes" : "No";
-
-ui->table->setItem(row, 6, new QTableWidgetItem(ext));
