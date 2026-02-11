@@ -1,47 +1,61 @@
-void LoginWindow::on_loginButton_clicked()
+#include "usermanager.h"
+#include <QFile>
+#include <QTextStream>
+
+bool UserManager::login(QString username, QString password)
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
-
-    if (username.isEmpty() || password.isEmpty()) {
-        ui->messageLabel->setText("Fill all fields");
-        return;
-    }
-
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/users.txt";
-    QFile file(path);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->messageLabel->setText("Could not open users file");
-        return;
-    }
+    QFile file("users.txt");
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
 
     QTextStream in(&file);
-    bool found = false;
 
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
+    while(!in.atEnd())
+    {
+        QString u, p;
+        in >> u >> p;
 
-        if (parts.size() < 4)
-            continue;
+        if(u == username && p == password)
+        {
+            file.close();
+            return true;
+        }
+    }
 
-        if (parts[1] == username && parts[2] == password) {
-            found = true;
-            break;
+    file.close();
+    return false;
+}
+
+bool UserManager::registerUser(QString username, QString password)
+{
+    QFile file("users.txt");
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream in(&file);
+
+    // check exists
+    while(!in.atEnd())
+    {
+        QString u, p;
+        in >> u >> p;
+
+        if(u == username)
+        {
+            file.close();
+            return false;
         }
     }
 
     file.close();
 
-    if (!found) {
-        ui->messageLabel->setText("Invalid username or password");
-        return;
-    }
+    // add new user
+    if(!file.open(QIODevice::Append | QIODevice::Text))
+        return false;
 
-    // ورود موفق
-    CustomerDashboard *dashboard = new CustomerDashboard();
-    dashboard->show();
-    this->close();
+    QTextStream out(&file);
+    out << username << " " << password << "\n";
+
+    file.close();
+    return true;
 }
