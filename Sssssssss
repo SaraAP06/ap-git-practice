@@ -1,0 +1,15 @@
+int id = -1;
+
+while (!in.atEnd()) {
+    QString line = in.readLine();
+    QStringList parts = line.split(",");
+
+    if (parts.size() < 4)
+        continue;
+
+    if (parts[1] == username && parts[2] == password) {
+        found = true;
+        id = parts[0].toInt();
+        break;
+    }
+}
