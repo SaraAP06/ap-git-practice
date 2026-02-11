@@ -1,6 +1,3 @@
-#ifndef CARLISTVIEW_H
-#define CARLISTVIEW_H
-
 #include <QWidget>
 #include <QString>
 #include <QList>
@@ -33,6 +30,7 @@ private:
 };
 
 #endif // CARLISTVIEW_H
+
 
 
 #include "carlistview.h"
@@ -156,8 +154,6 @@ void carListView::on_filterPushButton_clicked()
 
 
 
-
-
 #ifndef CUSTOMERDASHBOARD_H
 #define CUSTOMERDASHBOARD_H
 
@@ -191,6 +187,7 @@ private:
 };
 
 #endif // CUSTOMERDASHBOARD_H
+
 
 
 #include "customerdashboard.h"
@@ -248,7 +245,6 @@ void customerdashboard::on_pmyExtensionsPushButton_clicked()
 
 
 
-
 #ifndef EXTENSIONVIEW_H
 #define EXTENSIONVIEW_H
 
@@ -281,8 +277,11 @@ private:
 #endif // EXTENSIONVIEW_H
 
 
+
 #include "extensionview.h"
 #include "ui_extensionview.h"
+#include "session.h"
+
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
@@ -335,7 +334,7 @@ void extensionView::on_submitPushButton_clicked()
 
     QTextStream out(&file);
 
-    out << "1," << carId << ","
+    out << session::userId << "," << carId << ","
         << oldEndDate << ","
         << newDate.toString("yyyy-MM-dd")
         << ",Pending\n";
@@ -352,7 +351,6 @@ void extensionView::on_cancelPushButton_clicked()
 {
     close();
 }
-
 
 
 
@@ -385,7 +383,12 @@ private:
 #endif // LOGINWINDOW_H
 
 
+
+#include "LoginWindow.h"
+#include "ui_LoginWindow.h"
 #include "customerdashboard.h"
+#include "session.h"
+
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
@@ -426,6 +429,8 @@ void LoginWindow::on_loginPushButton_clicked()
     QTextStream in(&file);
     bool found = false;
 
+    int id = -1;
+
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList parts = line.split(",");
@@ -435,6 +440,7 @@ void LoginWindow::on_loginPushButton_clicked()
 
         if (parts[1] == username && parts[2] == password) {
             found = true;
+            id = parts[0].toInt();
             break;
         }
     }
@@ -447,6 +453,9 @@ void LoginWindow::on_loginPushButton_clicked()
     }
 
     // ورود موفق
+    session::userId=id;
+    session::username = username;
+
     customerdashboard *dashboard = new customerdashboard();
     dashboard->show();
     this->close();
@@ -513,7 +522,6 @@ void LoginWindow::on_registerPushButton_clicked()
 
 
 
-
 #ifndef MYEXTENSIONSVIEW_H
 #define MYEXTENSIONSVIEW_H
 
@@ -539,8 +547,11 @@ private:
 #endif // MYEXTENSIONSVIEW_H
 
 
+
+
 #include "myextensionsview.h"
 #include "ui_myextensionsview.h"
+#include "session.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -585,7 +596,7 @@ void myExtensionsView::loadExtensions()
         if (parts.size() < 5)
             continue;
 
-        if (parts[0] != "1")
+        if (parts[0].toInt() != session::userId)
             continue;
 
         ui->extensionTableWidget->insertRow(row);
@@ -605,6 +616,123 @@ void myExtensionsView::loadExtensions()
     file.close();
 }
 
+
+
+
+#ifndef MYRESERVATIONSVIEW_H
+#define MYRESERVATIONSVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class myReservationsView;
+}
+
+class myReservationsView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit myReservationsView(QWidget *parent = nullptr);
+    ~myReservationsView();
+
+private slots:
+    void on_extensionPushButton_clicked();
+
+private:
+    Ui::myReservationsView *ui;
+    void loadReservations();
+};
+
+#endif // MYRESERVATIONSVIEW_H
+
+
+
+
+#include "myreservationsview.h"
+#include "ui_myreservationsview.h"
+#include "extensionview.h"
+
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QMessageBox>
+#include <QCoreApplication>
+
+myReservationsView::myReservationsView(QWidget *parent)
+    : QWidget(parent),
+    ui(new Ui::myReservationsView)
+{
+    ui->setupUi(this);
+    loadReservations();
+}
+
+myReservationsView::~myReservationsView()
+{
+    delete ui;
+}
+
+void myReservationsView::loadReservations()
+{
+    QString path = QCoreApplication::applicationDirPath()
+    + "/reservations.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "Could not open reservations file");
+        return;
+    }
+
+    QTextStream in(&file);
+    int row = 0;
+
+    ui->reservationTableWidget->setRowCount(0);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 5)
+            continue;
+
+        // فقط رزروهای customer فعلی
+        if (parts[0] != "1")
+            continue;
+
+        ui->reservationTableWidget->insertRow(row);
+
+        for (int col = 0; col < 5; col++) {
+            ui->reservationTableWidget->setItem(
+                row, col,
+                new QTableWidgetItem(parts[col])
+                );
+        }
+        row++;
+    }
+
+    file.close();
+}
+
+void myReservationsView::on_extensionPushButton_clicked()
+{
+    int row = ui->reservationTableWidget->currentRow();
+
+    if (row < 0) {
+        QMessageBox::warning(this, "Error",
+                             "Select a reservation first");
+        return;
+    }
+
+    QString carId =
+        ui->reservationTableWidget->item(row, 1)->text();
+    QString endDate =
+        ui->reservationTableWidget->item(row, 3)->text();
+
+    extensionView *view =
+        new extensionView(carId, endDate);
+    view->show();
+}
 
 
 
@@ -640,8 +768,11 @@ private:
 
 
 
+
 #include "paymentview.h"
 #include "ui_paymentview.h"
+#include "session.h"
+
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
@@ -651,7 +782,7 @@ private:
 paymentView::paymentView(QWidget *parent)
     : QWidget(parent),
     ui(new Ui::paymentView)
-{
+{   
     ui->setupUi(this);
     loadPayments();
 }
@@ -685,7 +816,7 @@ void paymentView::loadPayments()
         if (parts.size() != 4)
             continue;
 
-        if (parts[0] != "1")
+        if (parts[0].toInt() != session::userId)
             continue;
 
         ui->paymentTableWidget->insertRow(row);
@@ -737,7 +868,6 @@ void paymentView::on_backPushButton_clicked()
 
 
 
-
 #ifndef RESERVATIONVIEW_H
 #define RESERVATIONVIEW_H
 
@@ -768,8 +898,13 @@ private:
 #endif // RESERVATIONVIEW_H
 
 
+
+
+
 #include "reservationview.h"
 #include "ui_reservationview.h"
+#include "session.h"
+
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
@@ -817,9 +952,7 @@ void reservationView::on_confirmPushButton_clicked()
 
     QTextStream out(&file);
 
-    // فرمت:
-    // customerId,carId,startDate,endDate,status
-    out << "1," << carId << ","
+    out << session::userId << "," << carId << ","
         << start.toString("yyyy-MM-dd") << ","
         << end.toString("yyyy-MM-dd") << ",Pending\n";
 
@@ -833,4 +966,113 @@ void reservationView::on_confirmPushButton_clicked()
 void reservationView::on_cancelPushButton_clicked()
 {
     close();
+}
+
+
+
+
+#ifndef SESSION_H
+#define SESSION_H
+
+#include <QString>
+
+class session
+{
+public:
+    static int userId;
+    static QString username;
+};
+
+#endif // SESSION_H
+
+
+
+
+#include "session.h"
+
+int session::userId = -1;
+QString session::username = "";
+
+
+
+
+
+#ifndef USERMANAGER_H
+#define USERMANAGER_H
+
+#include <QString>
+
+class userManager
+{
+public:
+    static bool login(QString username, QString password);
+
+    static bool registerUser(QString username, QString password);
+};
+
+#endif // USERMANAGER_H
+
+
+
+
+
+
+#include "userManager.h"
+#include <QFile>
+#include <QTextStream>
+
+bool userManager::registerUser(QString username, QString password)
+{
+    QFile file("users.txt");
+
+    if(!file.open(QIODevice::ReadWrite | QIODevice::Text))
+        return false;
+
+    QTextStream in(&file);
+
+    // check if user exists
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split("|");
+
+        if(parts[0] == username)
+        {
+            file.close();
+            return false; // user exists
+        }
+    }
+
+    QTextStream out(&file);
+    out << username << "|" << password << "\n";
+
+    file.close();
+    return true;
+}
+
+bool userManager::login(QString username, QString password)
+{
+    QFile file("users.txt");
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split("|");
+
+        if(parts.size() >= 2 &&
+            parts[0] == username &&
+            parts[1] == password)
+        {
+            file.close();
+            return true;
+        }
+    }
+
+    file.close();
+    return false;
 }
