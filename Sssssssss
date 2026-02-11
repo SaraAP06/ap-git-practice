@@ -1,11 +1,10 @@
 #include "LoginWindow.h"
 #include "ui_LoginWindow.h"
 #include "customerdashboard.h"
-#include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
-#include <QCoreApplication>
-#include <QCryptographicHash> // for hashing
+#include <QMessageBox>
+#include <QCryptographicHash>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -19,119 +18,124 @@ LoginWindow::~LoginWindow()
     delete ui;
 }
 
-// --- Hash password ---
-QString LoginWindow::hashPassword(const QString &password)
+// تابع کمکی برای هش کردن رمز
+QString hashPassword(const QString &password)
 {
     QByteArray hash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
     return QString(hash.toHex());
 }
 
-// --- Login ---
-void LoginWindow::on_loginPushButton_clicked()
+void LoginWindow::on_registerPushButton_clicked()
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = hashPassword(ui->passwordLineEdit->text());
+    QString username = ui->usernameLineEdit->text().trimmed();
+    QString password = ui->passwordLineEdit->text();
 
-    if (username.isEmpty() || password.isEmpty()) {
-        ui->messageLabel->setText("Please fill all fields.");
+    if(username.isEmpty() || password.isEmpty())
+    {
+        QMessageBox::warning(this, "Register", "Please fill all fields.");
         return;
     }
 
-    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QString path = "users.txt";
     QFile file(path);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->messageLabel->setText("No users registered yet.");
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
+    {
+        QMessageBox::warning(this, "Error", "Cannot open users file.");
         return;
     }
 
     QTextStream in(&file);
-    bool found = false;
+    int maxId = 0;
+    bool exists = false;
 
-    while (!in.atEnd()) {
+    // بررسی اینکه آیا کاربر قبلا ثبت شده
+    while (!in.atEnd())
+    {
         QString line = in.readLine();
         QStringList parts = line.split(",");
-        if (parts.size() == 2 && parts[0] == username && parts[1] == password) {
+        if(parts.size() < 3) continue;
+
+        int id = parts[0].toInt();
+        if(id > maxId) maxId = id;
+
+        if(parts[1] == username)
+        {
+            exists = true;
+            break;
+        }
+    }
+
+    if(exists)
+    {
+        QMessageBox::warning(this, "Register", "Username already exists.");
+        file.close();
+        return;
+    }
+
+    // اضافه کردن کاربر جدید
+    int newId = maxId + 1;
+    QString hashed = hashPassword(password);
+
+    QTextStream out(&file);
+    out << newId << "," << username << "," << hashed << "\n";
+    file.close();
+
+    QMessageBox::information(this, "Register", "Registration successful!\nYour ID: " + QString::number(newId));
+}
+
+void LoginWindow::on_loginPushButton_clicked()
+{
+    QString username = ui->usernameLineEdit->text().trimmed();
+    QString password = ui->passwordLineEdit->text();
+
+    if(username.isEmpty() || password.isEmpty())
+    {
+        QMessageBox::warning(this, "Login", "Please fill all fields.");
+        return;
+    }
+
+    QString path = "users.txt";
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QMessageBox::warning(this, "Error", "Cannot open users file.");
+        return;
+    }
+
+    QString hashed = hashPassword(password);
+    bool found = false;
+    int userId = -1;
+
+    QTextStream in(&file);
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+        if(parts.size() < 3) continue;
+
+        if(parts[1] == username && parts[2] == hashed)
+        {
             found = true;
+            userId = parts[0].toInt();
             break;
         }
     }
 
     file.close();
 
-    if (found) {
-        QMessageBox::information(this, "Login", "Login successful");
+    if(found)
+    {
+        currentUserId = QString::number(userId);
+        QMessageBox::information(this, "Login", "Login successful!");
         customerdashboard *dashboard = new customerdashboard();
         dashboard->show();
         this->close();
-    } else {
-        ui->messageLabel->setText("Invalid username or password.");
+    }
+    else
+    {
+        QMessageBox::warning(this, "Login", "Invalid username or password.");
     }
 }
-
-// --- Check if username exists ---
-bool LoginWindow::isUsernameTaken(const QString &username)
-{
-    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
-    QFile file(path);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false; // no file yet, username not taken
-
-    QTextStream in(&file);
-
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
-        if (parts.size() >= 1 && parts[0] == username) {
-            file.close();
-            return true;
-        }
-    }
-
-    file.close();
-    return false;
-}
-
-// --- Save new user ---
-void LoginWindow::saveNewUser(const QString &username, const QString &password)
-{
-    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
-    QFile file(path);
-
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
-        QMessageBox::warning(this, "Error", "Could not save new user.");
-        return;
-    }
-
-    QTextStream out(&file);
-    out << username << "," << hashPassword(password) << "\n";
-    file.close();
-}
-
-// --- Register ---
-void LoginWindow::on_registerPushButton_clicked()
-{
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
-
-    if (username.isEmpty() || password.isEmpty()) {
-        ui->messageLabel->setText("Please fill all fields.");
-        return;
-    }
-
-    if (isUsernameTaken(username)) {
-        ui->messageLabel->setText("Username already taken!");
-        return;
-    }
-
-    saveNewUser(username, password);
-    QMessageBox::information(this, "Register", "Registration successful!");
-    ui->messageLabel->setText("");
-    ui->usernameLineEdit->clear();
-    ui->passwordLineEdit->clear();
-}
-
 
 
 
@@ -150,7 +154,7 @@ class LoginWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    LoginWindow(QWidget *parent = nullptr);
+    explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow();
 
 private slots:
@@ -159,10 +163,7 @@ private slots:
 
 private:
     Ui::LoginWindow *ui;
-
-    bool isUsernameTaken(const QString &username);
-    void saveNewUser(const QString &username, const QString &password);
-    QString hashPassword(const QString &password); // hash password
+    QString currentUserId; // ID کاربر بعد از ورود
 };
 
 #endif // LOGINWINDOW_H
