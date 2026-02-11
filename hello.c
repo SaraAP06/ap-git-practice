@@ -1,3 +1,6 @@
+#ifndef CARLISTVIEW_H
+#define CARLISTVIEW_H
+
 #include <QWidget>
 #include <QString>
 #include <QList>
@@ -30,6 +33,7 @@ private:
 };
 
 #endif // CARLISTVIEW_H
+
 
 
 
@@ -96,7 +100,7 @@ void carListView::showCars(const QList<QStringList>& cars)
         ui->CarTableWidget->insertRow(i);
         for (int j = 0; j < 5; j++) {
             ui->CarTableWidget->setItem(i, j,
-                                  new QTableWidgetItem(cars[i][j]));
+                                        new QTableWidgetItem(cars[i][j]));
         }
     }
 }
@@ -154,7 +158,280 @@ void carListView::on_filterPushButton_clicked()
 
 
 
-#ifndef CUSTOMERDASHBOARD_H
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>carListView</class>
+ <widget class="QWidget" name="carListView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+    <italic>true</italic>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="reservePushButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>460</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Reserve</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="backPushButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>510</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="brandLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>10</y>
+     <width>113</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="typeLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>60</y>
+     <width>113</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="maxPriceLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>110</y>
+     <width>113</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="filterPushButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>160</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Filter</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="brandLabel">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>10</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Brand</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="typeLabel">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>50</y>
+     <width>51</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Type</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="maxPriceLabel">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>110</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+     <kerning>true</kerning>
+    </font>
+   </property>
+   <property name="text">
+    <string>Max Price</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="CarTableWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>220</y>
+     <width>721</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>721</width>
+     <height>221</height>
+    </size>
+   </property>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>New Column</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Brand</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Price</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>New Column</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Id</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+
+
+
+
+    #ifndef CUSTOMERDASHBOARD_H
 #define CUSTOMERDASHBOARD_H
 
 #include <QMainWindow>
@@ -244,8 +521,150 @@ void customerdashboard::on_pmyExtensionsPushButton_clicked()
 
 
 
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>customerdashboard</class>
+ <widget class="QWidget" name="customerdashboard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="welcomeLabel">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>80</y>
+     <width>181</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>25</pointsize>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>welcome</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="viewCarPushButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>210</y>
+     <width>171</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>View Cars</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="myReservationPushButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>280</y>
+     <width>171</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>My Reservation</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="paymentsPushButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>340</y>
+     <width>171</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Payments</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="LogoutPushButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>480</y>
+     <width>171</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Logout</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pmyExtensionsPushButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>410</y>
+     <width>171</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>My Extensions</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
 
-#ifndef EXTENSIONVIEW_H
+
+
+
+    #ifndef EXTENSIONVIEW_H
 #define EXTENSIONVIEW_H
 
 #include <QWidget>
@@ -278,10 +697,9 @@ private:
 
 
 
+
 #include "extensionview.h"
 #include "ui_extensionview.h"
-#include "session.h"
-
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
@@ -334,7 +752,7 @@ void extensionView::on_submitPushButton_clicked()
 
     QTextStream out(&file);
 
-    out << session::userId << "," << carId << ","
+    out << "1," << carId << ","
         << oldEndDate << ","
         << newDate.toString("yyyy-MM-dd")
         << ",Pending\n";
@@ -355,7 +773,124 @@ void extensionView::on_cancelPushButton_clicked()
 
 
 
-#ifndef LOGINWINDOW_H
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>extensionView</class>
+ <widget class="QWidget" name="extensionView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="infoLabel">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>70</y>
+     <width>271</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Request Extension</string>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="newEndDateEdit">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>230</y>
+     <width>131</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="submitPushButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>390</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Submit</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="cancelPushButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>460</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>170</y>
+     <width>161</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>New End Date</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+
+
+
+    #ifndef LOGINWINDOW_H
 #define LOGINWINDOW_H
 
 #include <QMainWindow>
@@ -384,16 +919,11 @@ private:
 
 
 
+
 #include "LoginWindow.h"
 #include "ui_LoginWindow.h"
 #include "customerdashboard.h"
-#include "session.h"
-
 #include <QMessageBox>
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QCoreApplication>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -409,120 +939,280 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::on_loginPushButton_clicked()
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
+    QString username =
+        ui->usernameLineEdit->text();
+    QString password =
+        ui->passwordLineEdit->text();
 
-    if (username.isEmpty() || password.isEmpty()) {
-        ui->messageLabel->setText("Fill all fields");
+    if (username.isEmpty() || password.isEmpty())
+    {
+        ui->messageLabel->setText("Please fill all fields.");
         return;
     }
-
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/users.txt";
-    QFile file(path);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->messageLabel->setText("Could not open users file");
-        return;
+    //فعلا فیک بعدا وصل میشه به manager
+    if (username == "test" && password == "1234")
+    {
+        QMessageBox::information(this, "Login", "Login successful");
+        customerdashboard *dashboard = new customerdashboard();
+        dashboard->show();
+        this->close();
     }
-
-    QTextStream in(&file);
-    bool found = false;
-
-    int id = -1;
-
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
-
-        if (parts.size() < 4)
-            continue;
-
-        if (parts[1] == username && parts[2] == password) {
-            found = true;
-            id = parts[0].toInt();
-            break;
-        }
+    else
+    {
+        ui->messageLabel->setText("Invalid username or password.");
     }
-
-    file.close();
-
-    if (!found) {
-        ui->messageLabel->setText("Invalid username or password");
-        return;
-    }
-
-    // ورود موفق
-    session::userId=id;
-    session::username = username;
-
-    customerdashboard *dashboard = new customerdashboard();
-    dashboard->show();
-    this->close();
 }
 
 void LoginWindow::on_registerPushButton_clicked()
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
-
-    if (username.isEmpty() || password.isEmpty()) {
-        ui->messageLabel->setText("Fill all fields");
-        return;
-    }
-
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/users.txt";
-    QFile file(path);
-
-    // اول چک کنیم یوزر وجود نداشته باشه
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-
-        while (!in.atEnd()) {
-            QString line = in.readLine();
-            QStringList parts = line.split(",");
-
-            if (parts.size() >= 2 && parts[1] == username) {
-                ui->messageLabel->setText("Username already exists");
-                file.close();
-                return;
-            }
-        }
-        file.close();
-    }
-
-    // پیدا کردن id جدید
-    int newId = 1;
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        while (!in.atEnd()) {
-            newId++;
-            in.readLine();
-        }
-        file.close();
-    }
-
-    // ذخیره کاربر
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
-        ui->messageLabel->setText("Error saving user");
-        return;
-    }
-
-    QTextStream out(&file);
-    out << newId << ","
-        << username << ","
-        << password << ",customer\n";
-
-    file.close();
-
-    ui->messageLabel->setText("Registered successfully");
+    QMessageBox::information(this, "Register", "Register page not implemented yet");
 }
 
 
 
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginWindow</class>
+ <widget class="QMainWindow" name="LoginWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>6</pointsize>
+    <italic>false</italic>
+    <bold>false</bold>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+    <stylestrategy>PreferDefault</stylestrategy>
+    <hintingpreference>PreferDefaultHinting</hintingpreference>
+   </font>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="tabletTracking">
+   <bool>false</bool>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextOnly</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="UsernameLabel">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>60</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+      <italic>true</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="text">
+     <string>Username</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="usernameLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>110</y>
+      <width>113</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+      <italic>false</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="accessibleDescription">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#c595c8;&quot;&gt;#c595c8&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="PasswordLabel">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>190</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+      <italic>true</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="toolTipDuration">
+     <number>-1</number>
+    </property>
+    <property name="text">
+     <string>Password</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="passwordLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>240</y>
+      <width>113</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+      <italic>false</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::Password</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loginPushButton">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>370</y>
+      <width>83</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <italic>true</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="text">
+     <string>Login</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="registerPushButton">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>420</y>
+      <width>83</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <italic>true</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="text">
+     <string>Register</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="messageLabel">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>460</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+      <italic>true</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <stylestrategy>PreferDefault</stylestrategy>
+      <hintingpreference>PreferDefaultHinting</hintingpreference>
+     </font>
+    </property>
+    <property name="text">
+     <string>Message</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>760</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
 
-#ifndef MYEXTENSIONSVIEW_H
+
+
+
+    #ifndef MYEXTENSIONSVIEW_H
 #define MYEXTENSIONSVIEW_H
 
 #include <QWidget>
@@ -548,10 +1238,8 @@ private:
 
 
 
-
 #include "myextensionsview.h"
 #include "ui_myextensionsview.h"
-#include "session.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -596,19 +1284,19 @@ void myExtensionsView::loadExtensions()
         if (parts.size() < 5)
             continue;
 
-        if (parts[0].toInt() != session::userId)
+        if (parts[0] != "1")
             continue;
 
         ui->extensionTableWidget->insertRow(row);
 
         ui->extensionTableWidget->setItem(row, 0,
-                                    new QTableWidgetItem(parts[1]));
+                                          new QTableWidgetItem(parts[1]));
         ui->extensionTableWidget->setItem(row, 1,
-                                    new QTableWidgetItem(parts[2]));
+                                          new QTableWidgetItem(parts[2]));
         ui->extensionTableWidget->setItem(row, 2,
-                                    new QTableWidgetItem(parts[3]));
+                                          new QTableWidgetItem(parts[3]));
         ui->extensionTableWidget->setItem(row, 3,
-                                    new QTableWidgetItem(parts[4]));
+                                          new QTableWidgetItem(parts[4]));
 
         row++;
     }
@@ -617,9 +1305,141 @@ void myExtensionsView::loadExtensions()
 }
 
 
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>myExtensionsView</class>
+ <widget class="QWidget" name="myExtensionsView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTableWidget" name="extensionTableWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>721</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>721</width>
+     <height>221</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>Car ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Old End Date</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>New End Date</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Status</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Note</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QPushButton" name="backPushButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>480</y>
+     <width>83</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>70</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>My Extensions</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
 
 
-#ifndef MYRESERVATIONSVIEW_H
+
+    #ifndef MYRESERVATIONSVIEW_H
 #define MYRESERVATIONSVIEW_H
 
 #include <QWidget>
@@ -645,7 +1465,6 @@ private:
 };
 
 #endif // MYRESERVATIONSVIEW_H
-
 
 
 
@@ -737,7 +1556,160 @@ void myReservationsView::on_extensionPushButton_clicked()
 
 
 
-#ifndef PAYMENTVIEW_H
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>myReservationsView</class>
+ <widget class="QWidget" name="myReservationsView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTableWidget" name="reservationTableWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>721</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>721</width>
+     <height>221</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>Customer ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Car ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Start Date</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>End Date</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Status</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QPushButton" name="backPushButton">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>480</y>
+     <width>170</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="extensionPushButton">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>430</y>
+     <width>171</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Request Extension</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>80</y>
+     <width>191</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>My Reservations</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
+
+
+    #ifndef PAYMENTVIEW_H
 #define PAYMENTVIEW_H
 
 #include <QWidget>
@@ -768,11 +1740,14 @@ private:
 
 
 
-
 #include "paymentview.h"
 #include "ui_paymentview.h"
 #include "session.h"
 
+#include <QFile>
+#include <QTextStream>
+#include "paymentview.h"
+#include "ui_paymentview.h"
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
@@ -782,7 +1757,7 @@ private:
 paymentView::paymentView(QWidget *parent)
     : QWidget(parent),
     ui(new Ui::paymentView)
-{   
+{
     ui->setupUi(this);
     loadPayments();
 }
@@ -816,17 +1791,17 @@ void paymentView::loadPayments()
         if (parts.size() != 4)
             continue;
 
-        if (parts[0].toInt() != session::userId)
+        if (parts[0] != "1")
             continue;
 
         ui->paymentTableWidget->insertRow(row);
 
         ui->paymentTableWidget->setItem(row, 0,
-                                  new QTableWidgetItem(parts[1]));
+                                        new QTableWidgetItem(parts[1]));
         ui->paymentTableWidget->setItem(row, 1,
-                                  new QTableWidgetItem(parts[2]));
+                                        new QTableWidgetItem(parts[2]));
         ui->paymentTableWidget->setItem(row, 2,
-                                  new QTableWidgetItem(parts[3]));
+                                        new QTableWidgetItem(parts[3]));
 
         row++;
     }
@@ -857,7 +1832,7 @@ void paymentView::on_payPushButton_clicked()
                              "Payment successful");
 
     ui->paymentTableWidget->setItem(row, 2,
-                              new QTableWidgetItem("Paid"));
+                                    new QTableWidgetItem("Paid"));
 }
 
 void paymentView::on_backPushButton_clicked()
@@ -867,8 +1842,137 @@ void paymentView::on_backPushButton_clicked()
 
 
 
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>paymentView</class>
+ <widget class="QWidget" name="paymentView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTableWidget" name="paymentTableWidget">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>180</y>
+     <width>521</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>521</width>
+     <height>181</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <row/>
+   <row/>
+   <row/>
+   <row/>
+   <column>
+    <property name="text">
+     <string>Car ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Amount</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Status</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Action</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QPushButton" name="payPushButton">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>430</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Pay Selected</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="backPushButton">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>480</y>
+     <width>151</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="paymentsLabel">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>80</y>
+     <width>121</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Payments</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
 
-#ifndef RESERVATIONVIEW_H
+
+
+
+    #ifndef RESERVATIONVIEW_H
 #define RESERVATIONVIEW_H
 
 #include <QWidget>
@@ -900,11 +2004,8 @@ private:
 
 
 
-
 #include "reservationview.h"
 #include "ui_reservationview.h"
-#include "session.h"
-
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
@@ -952,7 +2053,9 @@ void reservationView::on_confirmPushButton_clicked()
 
     QTextStream out(&file);
 
-    out << session::userId << "," << carId << ","
+    // فرمت:
+    // customerId,carId,startDate,endDate,status
+    out << "1," << carId << ","
         << start.toString("yyyy-MM-dd") << ","
         << end.toString("yyyy-MM-dd") << ",Pending\n";
 
@@ -971,108 +2074,169 @@ void reservationView::on_cancelPushButton_clicked()
 
 
 
-#ifndef SESSION_H
-#define SESSION_H
-
-#include <QString>
-
-class session
-{
-public:
-    static int userId;
-    static QString username;
-};
-
-#endif // SESSION_H
-
-
-
-
-#include "session.h"
-
-int session::userId = -1;
-QString session::username = "";
-
-
-
-
-
-#ifndef USERMANAGER_H
-#define USERMANAGER_H
-
-#include <QString>
-
-class userManager
-{
-public:
-    static bool login(QString username, QString password);
-
-    static bool registerUser(QString username, QString password);
-};
-
-#endif // USERMANAGER_H
-
-
-
-
-
-
-#include "userManager.h"
-#include <QFile>
-#include <QTextStream>
-
-bool userManager::registerUser(QString username, QString password)
-{
-    QFile file("users.txt");
-
-    if(!file.open(QIODevice::ReadWrite | QIODevice::Text))
-        return false;
-
-    QTextStream in(&file);
-
-    // check if user exists
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-        QStringList parts = line.split("|");
-
-        if(parts[0] == username)
-        {
-            file.close();
-            return false; // user exists
-        }
-    }
-
-    QTextStream out(&file);
-    out << username << "|" << password << "\n";
-
-    file.close();
-    return true;
-}
-
-bool userManager::login(QString username, QString password)
-{
-    QFile file("users.txt");
-
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false;
-
-    QTextStream in(&file);
-
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-        QStringList parts = line.split("|");
-
-        if(parts.size() >= 2 &&
-            parts[0] == username &&
-            parts[1] == password)
-        {
-            file.close();
-            return true;
-        }
-    }
-
-    file.close();
-    return false;
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>reservationView</class>
+ <widget class="QWidget" name="reservationView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="carInfoLabel">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>160</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Selected Car</string>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="startDateEdit">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>240</y>
+     <width>108</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="endDateEdit">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>310</y>
+     <width>110</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="confirmPushButton">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>400</y>
+     <width>191</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Confirm Reservation</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="cancelPushButton">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>450</y>
+     <width>191</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="reservationLabel">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>60</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Reservation</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>240</y>
+     <width>63</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>310</y>
+     <width>63</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>End</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
