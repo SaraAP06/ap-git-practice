@@ -1,1 +1,95 @@
+void LoginWindow::on_loginPushButton_clicked()
+{
+    QString username = ui->usernameLineEdit->text();
+    QString password = ui->passwordLineEdit->text();
 
+    if (username.isEmpty() || password.isEmpty()) {
+        ui->messageLabel->setText("Fill all fields");
+        return;
+    }
+
+    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ui->messageLabel->setText("users file error");
+        return;
+    }
+
+    QTextStream in(&file);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 3) continue;
+
+        if (parts[1] == username && parts[2] == password) {
+            Session::userId = parts[0].toInt();
+            Session::username = username;
+
+            QMessageBox::information(this, "Login", "Login successful");
+
+            customerdashboard *d = new customerdashboard();
+            d->show();
+            this->close();
+            return;
+        }
+    }
+
+    ui->messageLabel->setText("Wrong username or password");
+}
+
+
+
+
+
+
+void LoginWindow::on_registerPushButton_clicked()
+{
+    QString username = ui->usernameLineEdit->text();
+    QString password = ui->passwordLineEdit->text();
+
+    if (username.isEmpty() || password.isEmpty()) {
+        ui->messageLabel->setText("Fill all fields");
+        return;
+    }
+
+    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QFile file(path);
+
+    int lastId = 0;
+
+    // چک duplicate + گرفتن آخرین id
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList parts = line.split(",");
+
+            if (parts.size() != 3) continue;
+
+            if (parts[1] == username) {
+                ui->messageLabel->setText("Username exists");
+                file.close();
+                return;
+            }
+
+            lastId = parts[0].toInt();
+        }
+        file.close();
+    }
+
+    // ثبت یوزر
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        ui->messageLabel->setText("File error");
+        return;
+    }
+
+    QTextStream out(&file);
+    out << (lastId + 1) << "," << username << "," << password << "\n";
+    file.close();
+
+    ui->messageLabel->setText("Registered successfully");
+}
