@@ -1,4 +1,4 @@
-void LoginWindow::on_registerButton_clicked()
+void LoginWindow::on_loginButton_clicked()
 {
     QString username = ui->usernameLineEdit->text();
     QString password = ui->passwordLineEdit->text();
@@ -12,46 +12,36 @@ void LoginWindow::on_registerButton_clicked()
                    + "/users.txt";
     QFile file(path);
 
-    // اول چک کنیم یوزر وجود نداشته باشه
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-
-        while (!in.atEnd()) {
-            QString line = in.readLine();
-            QStringList parts = line.split(",");
-
-            if (parts.size() >= 2 && parts[1] == username) {
-                ui->messageLabel->setText("Username already exists");
-                file.close();
-                return;
-            }
-        }
-        file.close();
-    }
-
-    // پیدا کردن id جدید
-    int newId = 1;
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        while (!in.atEnd()) {
-            newId++;
-            in.readLine();
-        }
-        file.close();
-    }
-
-    // ذخیره کاربر
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
-        ui->messageLabel->setText("Error saving user");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ui->messageLabel->setText("Could not open users file");
         return;
     }
 
-    QTextStream out(&file);
-    out << newId << ","
-        << username << ","
-        << password << ",customer\n";
+    QTextStream in(&file);
+    bool found = false;
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() < 4)
+            continue;
+
+        if (parts[1] == username && parts[2] == password) {
+            found = true;
+            break;
+        }
+    }
 
     file.close();
 
-    ui->messageLabel->setText("Registered successfully");
+    if (!found) {
+        ui->messageLabel->setText("Invalid username or password");
+        return;
+    }
+
+    // ورود موفق
+    CustomerDashboard *dashboard = new CustomerDashboard();
+    dashboard->show();
+    this->close();
 }
