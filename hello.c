@@ -1,61 +1,15 @@
-#include "usermanager.h"
-#include <QFile>
-#include <QTextStream>
+QString user = ui->usernameEdit->text();
+QString pass = ui->passwordEdit->text();
 
-bool UserManager::login(QString username, QString password)
+if(UserManager::login(user, pass))
 {
-    QFile file("users.txt");
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false;
+    Session::currentUser = user;
 
-    QTextStream in(&file);
+    QMessageBox::information(this,"Login","Success");
 
-    while(!in.atEnd())
-    {
-        QString u, p;
-        in >> u >> p;
-
-        if(u == username && p == password)
-        {
-            file.close();
-            return true;
-        }
-    }
-
-    file.close();
-    return false;
+    // برو صفحه اصلی
 }
-
-bool UserManager::registerUser(QString username, QString password)
+else
 {
-    QFile file("users.txt");
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false;
-
-    QTextStream in(&file);
-
-    // check exists
-    while(!in.atEnd())
-    {
-        QString u, p;
-        in >> u >> p;
-
-        if(u == username)
-        {
-            file.close();
-            return false;
-        }
-    }
-
-    file.close();
-
-    // add new user
-    if(!file.open(QIODevice::Append | QIODevice::Text))
-        return false;
-
-    QTextStream out(&file);
-    out << username << " " << password << "\n";
-
-    file.close();
-    return true;
+    QMessageBox::warning(this,"Login","Wrong username or password");
 }
