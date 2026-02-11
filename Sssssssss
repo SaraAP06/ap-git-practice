@@ -1,29 +1,35 @@
-int getNextUserId();
-bool usernameExists(const QString &username);
-
-
-
-int LoginWindow::getNextUserId()
+void updateCarStatus(const QString &carId)
 {
-    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QString path = QCoreApplication::applicationDirPath() + "/cars.txt";
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return 1;
+        return;
 
+    QStringList lines;
     QTextStream in(&file);
-    int lastId = 0;
 
     while (!in.atEnd())
+        lines.append(in.readLine());
+
+    file.close();
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+
+    for (int i = 0; i < lines.size(); i++)
     {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
-        if (parts.size() >= 1)
-            lastId = parts[0].toInt();
+        QStringList parts = lines[i].split(",");
+
+        if (parts.size() == 5 && parts[0] == carId)
+            parts[4] = "Reserved";
+
+        out << parts.join(",") << "\n";
     }
 
     file.close();
-    return lastId + 1;
 }
 
 
@@ -31,31 +37,39 @@ int LoginWindow::getNextUserId()
 
 
 
-
-bool LoginWindow::usernameExists(const QString &username)
+void createPayment(const QString &carId)
 {
-    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
-    QFile file(path);
+    QString carPath = QCoreApplication::applicationDirPath() + "/cars.txt";
+    QFile carFile(carPath);
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false;
+    if (!carFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
 
-    QTextStream in(&file);
+    QTextStream in(&carFile);
+    int price = 0;
 
     while (!in.atEnd())
     {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
-
-        if (parts.size() >= 2 && parts[1] == username)
+        QStringList parts = in.readLine().split(",");
+        if (parts.size() == 5 && parts[0] == carId)
         {
-            file.close();
-            return true;
+            price = parts[3].toInt();
+            break;
         }
     }
 
-    file.close();
-    return false;
+    carFile.close();
+
+    QString payPath = QCoreApplication::applicationDirPath() + "/payments.txt";
+    QFile payFile(payPath);
+
+    if (!payFile.open(QIODevice::Append | QIODevice::Text))
+        return;
+
+    QTextStream out(&payFile);
+    out << "1," << carId << "," << price << ",Unpaid\n";
+
+    payFile.close();
 }
 
 
@@ -63,39 +77,43 @@ bool LoginWindow::usernameExists(const QString &username)
 
 
 
-
-void LoginWindow::on_registerPushButton_clicked()
+void reservationView::on_confirmPushButton_clicked()
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
+    QDate start = ui->startDateEdit->date();
+    QDate end = ui->endDateEdit->date();
 
-    if (username.isEmpty() || password.isEmpty())
-    {
-        ui->messageLabel->setText("Fill all fields");
+    if (end <= start) {
+        QMessageBox::warning(this, "Error",
+                             "End date must be after start date");
         return;
     }
 
-    if (usernameExists(username))
-    {
-        ui->messageLabel->setText("Username already exists");
-        return;
-    }
-
-    int newId = getNextUserId();
-
-    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/reservations.txt";
     QFile file(path);
 
-    if (!file.open(QIODevice::Append | QIODevice::Text))
-    {
-        ui->messageLabel->setText("Error saving user");
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "Could not save reservation");
         return;
     }
 
     QTextStream out(&file);
-    out << newId << "," << username << "," << password << "\n";
+
+    out << "1," << carId << ","
+        << start.toString("yyyy-MM-dd") << ","
+        << end.toString("yyyy-MM-dd") << ",Pending\n";
 
     file.close();
 
-    ui->messageLabel->setText("Register successful");
+    // تغییر وضعیت ماشین
+    updateCarStatus(carId);
+
+    // ساخت Payment
+    createPayment(carId);
+
+    QMessageBox::information(this, "Done",
+                             "Reservation submitted & Car reserved");
+
+    close();
 }
