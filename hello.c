@@ -1,64 +1,57 @@
-#include "myextensionsview.h"
-#include "ui_myextensionsview.h"
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QMessageBox>
-#include <QCoreApplication>
-
-MyExtensionsView::MyExtensionsView(QWidget *parent)
-    : QWidget(parent),
-      ui(new Ui::MyExtensionsView)
+void LoginWindow::on_registerButton_clicked()
 {
-    ui->setupUi(this);
-    loadExtensions();
-}
+    QString username = ui->usernameLineEdit->text();
+    QString password = ui->passwordLineEdit->text();
 
-MyExtensionsView::~MyExtensionsView()
-{
-    delete ui;
-}
-
-void MyExtensionsView::loadExtensions()
-{
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/extensions.txt";
-    QFile file(path);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Error",
-            "Could not open extensions file");
+    if (username.isEmpty() || password.isEmpty()) {
+        ui->messageLabel->setText("Fill all fields");
         return;
     }
 
-    QTextStream in(&file);
-    int row = 0;
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/users.txt";
+    QFile file(path);
 
-    ui->extensionTable->setRowCount(0);
+    // اول چک کنیم یوزر وجود نداشته باشه
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
 
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList parts = line.split(",");
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList parts = line.split(",");
 
-        if (parts.size() < 5)
-            continue;
-
-        if (parts[0] != "1")
-            continue;
-
-        ui->extensionTable->insertRow(row);
-
-        ui->extensionTable->setItem(row, 0,
-            new QTableWidgetItem(parts[1]));
-        ui->extensionTable->setItem(row, 1,
-            new QTableWidgetItem(parts[2]));
-        ui->extensionTable->setItem(row, 2,
-            new QTableWidgetItem(parts[3]));
-        ui->extensionTable->setItem(row, 3,
-            new QTableWidgetItem(parts[4]));
-
-        row++;
+            if (parts.size() >= 2 && parts[1] == username) {
+                ui->messageLabel->setText("Username already exists");
+                file.close();
+                return;
+            }
+        }
+        file.close();
     }
 
+    // پیدا کردن id جدید
+    int newId = 1;
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            newId++;
+            in.readLine();
+        }
+        file.close();
+    }
+
+    // ذخیره کاربر
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        ui->messageLabel->setText("Error saving user");
+        return;
+    }
+
+    QTextStream out(&file);
+    out << newId << ","
+        << username << ","
+        << password << ",customer\n";
+
     file.close();
+
+    ui->messageLabel->setText("Registered successfully");
 }
