@@ -1,9 +1,7 @@
-void createReservation(const QString &carId,
-                       const QString &startDate,
-                       const QString &endDate)
+void createPayment(const QString &carId)
 {
     QString path = QCoreApplication::applicationDirPath()
-                   + "/reservations.txt";
+                   + "/payments.txt";
     QFile file(path);
 
     if (!file.open(QIODevice::Append | QIODevice::Text))
@@ -11,10 +9,11 @@ void createReservation(const QString &carId,
 
     QTextStream out(&file);
 
+    int price = 100;   // ساده و ثابت (بعداً می‌تونی از cars.txt بخونی)
+
     out << Session::userId << ","
         << carId << ","
-        << startDate << ","
-        << endDate << ",Pending\n";
+        << price << ",Unpaid\n";
 
     file.close();
 }
@@ -22,25 +21,94 @@ void createReservation(const QString &carId,
 
 
 
-void reservationView::on_confirmPushButton_clicked()
-{
-    QString startDate =
-        ui->startDateEdit->date().toString("yyyy-MM-dd");
-    QString endDate =
-        ui->endDateEdit->date().toString("yyyy-MM-dd");
+createReservation(carId, startDate, endDate);
+updateCarStatus(carId);
 
-    if (endDate <= startDate)
-    {
+
+
+
+
+
+createPayment(carId);
+
+
+
+
+void PaymentView::on_payButton_clicked()
+{
+    int row = ui->paymentTable->currentRow();
+
+    if (row < 0) {
         QMessageBox::warning(this, "Error",
-                             "End date must be after start date");
+                             "Select a payment first");
         return;
     }
 
-    createReservation(carId, startDate, endDate);
-    updateCarStatus(carId);
+    QString carId = ui->paymentTable->item(row, 0)->text();
+    QString status = ui->paymentTable->item(row, 2)->text();
+
+    if (status == "Paid") {
+        QMessageBox::information(this, "Info",
+                                 "Already paid");
+        return;
+    }
+
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/payments.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QStringList lines;
+    QTextStream in(&file);
+
+    while (!in.atEnd())
+        lines.append(in.readLine());
+
+    file.close();
+
+    // rewrite file
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+
+    for (QString line : lines)
+    {
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 4) {
+            out << line << "\n";
+            continue;
+        }
+
+        if (parts[0].toInt() == Session::userId &&
+            parts[1] == carId &&
+            parts[3] == "Unpaid")
+        {
+            parts[3] = "Paid";
+            out << parts.join(",") << "\n";
+        }
+        else
+        {
+            out << line << "\n";
+        }
+    }
+
+    file.close();
 
     QMessageBox::information(this, "Done",
-                             "Reservation submitted");
+                             "Payment successful");
 
-    close();
+    loadPayments();
 }
+
+
+
+
+
+#include "session.h"
+
+if (parts[0].toInt() != Session::userId)
+    continue;
