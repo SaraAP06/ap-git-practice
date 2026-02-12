@@ -1,3 +1,46 @@
-debug\CarRentalCustomer.exe:-1: error: LNK1120: 1 unresolved externals
+void createReservation(const QString &carId,
+                       const QString &startDate,
+                       const QString &endDate)
+{
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/reservations.txt";
+    QFile file(path);
 
-moc_reservationview.obj:-1: error: LNK2019: unresolved external symbol "private: void __cdecl reservationView::on_cancelPushButton_clicked(void)" (?on_cancelPushButton_clicked@reservationView@@AEAAXXZ) referenced in function "public: virtual int __cdecl reservationView::qt_metacall(enum QMetaObject::Call,int,void * *)" (?qt_metacall@reservationView@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z)
+    if (!file.open(QIODevice::Append | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+
+    out << Session::userId << ","
+        << carId << ","
+        << startDate << ","
+        << endDate << ",Pending\n";
+
+    file.close();
+}
+
+
+
+
+void reservationView::on_confirmPushButton_clicked()
+{
+    QString startDate =
+        ui->startDateEdit->date().toString("yyyy-MM-dd");
+    QString endDate =
+        ui->endDateEdit->date().toString("yyyy-MM-dd");
+
+    if (endDate <= startDate)
+    {
+        QMessageBox::warning(this, "Error",
+                             "End date must be after start date");
+        return;
+    }
+
+    createReservation(carId, startDate, endDate);
+    updateCarStatus(carId);
+
+    QMessageBox::information(this, "Done",
+                             "Reservation submitted");
+
+    close();
+}
