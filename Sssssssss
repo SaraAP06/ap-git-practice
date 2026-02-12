@@ -1,1 +1,175 @@
-D:\sara\DS\CarRentalCustomer\paymentview.cpp:110:10: Missing reference in range-for with non trivial type (QString) [clazy-range-loop-reference]
+#ifndef PAYMENTVIEW_H
+#define PAYMENTVIEW_H
+
+#include <QWidget>
+
+namespace Ui {
+class paymentView;
+}
+
+class paymentView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit paymentView(QWidget *parent = nullptr);
+    ~paymentView();
+
+private slots:
+    void on_payPushButton_clicked();
+
+private:
+    Ui::paymentView *ui;
+    void loadPayments();
+    void markAsPaid(int row);
+};
+
+#endif // PAYMENTVIEW_H
+
+
+
+
+
+#include "paymentview.h"
+#include "ui_paymentview.h"
+#include "session.h"
+
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QMessageBox>
+#include <QCoreApplication>
+
+paymentView::paymentView(QWidget *parent)
+    : QWidget(parent),
+      ui(new Ui::paymentView)
+{
+    ui->setupUi(this);
+
+    ui->paymentTableWidget->setColumnCount(4);
+    ui->paymentTableWidget->setHorizontalHeaderLabels(
+        QStringList() << "Car ID" << "Amount" << "Status" << "User ID"
+    );
+
+    loadPayments();
+}
+
+paymentView::~paymentView()
+{
+    delete ui;
+}
+
+void paymentView::loadPayments()
+{
+    QString path = QCoreApplication::applicationDirPath() + "/payments.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    ui->paymentTableWidget->setRowCount(0);
+
+    int row = 0;
+
+    while (!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 4)
+            continue;
+
+        if (parts[0].toInt() != session::userId)
+            continue;
+
+        ui->paymentTableWidget->insertRow(row);
+
+        ui->paymentTableWidget->setItem(row, 0,
+            new QTableWidgetItem(parts[1]));
+
+        ui->paymentTableWidget->setItem(row, 1,
+            new QTableWidgetItem(parts[2]));
+
+        ui->paymentTableWidget->setItem(row, 2,
+            new QTableWidgetItem(parts[3]));
+
+        ui->paymentTableWidget->setItem(row, 3,
+            new QTableWidgetItem(parts[0]));
+
+        row++;
+    }
+
+    file.close();
+}
+
+void paymentView::on_payPushButton_clicked()
+{
+    int row = ui->paymentTableWidget->currentRow();
+
+    if (row < 0)
+    {
+        QMessageBox::warning(this, "Error", "Select a payment");
+        return;
+    }
+
+    QString status = ui->paymentTableWidget->item(row, 2)->text();
+
+    if (status == "Paid")
+    {
+        QMessageBox::information(this, "Info", "Already paid");
+        return;
+    }
+
+    markAsPaid(row);
+    loadPayments();
+
+    QMessageBox::information(this, "Success", "Payment completed");
+}
+
+void paymentView::markAsPaid(int selectedRow)
+{
+    QString path = QCoreApplication::applicationDirPath() + "/payments.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    QStringList lines;
+
+    while (!in.atEnd())
+        lines.append(in.readLine());
+
+    file.close();
+
+    int currentUserRow = -1;
+    int userCount = -1;
+
+    for (int i = 0; i < lines.size(); i++)
+    {
+        QStringList parts = lines[i].split(",");
+
+        if (parts.size() != 4)
+            continue;
+
+        if (parts[0].toInt() == session::userId)
+            userCount++;
+
+        if (userCount == selectedRow)
+        {
+            parts[3] = "Paid";
+            lines[i] = parts.join(",");
+            break;
+        }
+    }
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    for (QString line : lines)
+        out << line << "\n";
+
+    file.close();
+}
