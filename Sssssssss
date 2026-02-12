@@ -1,39 +1,3 @@
-void createPayment(const QString &carId)
-{
-    QString path = QCoreApplication::applicationDirPath()
-                   + "/payments.txt";
-    QFile file(path);
-
-    if (!file.open(QIODevice::Append | QIODevice::Text))
-        return;
-
-    QTextStream out(&file);
-
-    int price = 100;   // ساده و ثابت (بعداً می‌تونی از cars.txt بخونی)
-
-    out << Session::userId << ","
-        << carId << ","
-        << price << ",Unpaid\n";
-
-    file.close();
-}
-
-
-
-
-createReservation(carId, startDate, endDate);
-updateCarStatus(carId);
-
-
-
-
-
-
-createPayment(carId);
-
-
-
-
 void PaymentView::on_payButton_clicked()
 {
     int row = ui->paymentTable->currentRow();
@@ -103,12 +67,3 @@ void PaymentView::on_payButton_clicked()
 
     loadPayments();
 }
-
-
-
-
-
-#include "session.h"
-
-if (parts[0].toInt() != Session::userId)
-    continue;
