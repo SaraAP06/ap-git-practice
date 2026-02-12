@@ -35,8 +35,6 @@ private:
 #endif // CARLISTVIEW_H
 
 
-
-
 #include "carlistview.h"
 #include "ui_carlistview.h"
 #include "reservationview.h"
@@ -155,6 +153,7 @@ void carListView::on_filterPushButton_clicked()
 
     showCars(filtered);
 }
+
 
 
 
@@ -466,7 +465,6 @@ private:
 #endif // CUSTOMERDASHBOARD_H
 
 
-
 #include "customerdashboard.h"
 #include "ui_customerdashboard.h"
 #include "carlistview.h"
@@ -518,7 +516,6 @@ void customerdashboard::on_pmyExtensionsPushButton_clicked()
     myExtensionsView *view = new myExtensionsView();
     view->show();
 }
-
 
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -664,6 +661,7 @@ void customerdashboard::on_pmyExtensionsPushButton_clicked()
 
 
 
+
     #ifndef EXTENSIONVIEW_H
 #define EXTENSIONVIEW_H
 
@@ -696,10 +694,10 @@ private:
 #endif // EXTENSIONVIEW_H
 
 
-
-
 #include "extensionview.h"
 #include "ui_extensionview.h"
+#include "session.h"
+
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
@@ -752,7 +750,7 @@ void extensionView::on_submitPushButton_clicked()
 
     QTextStream out(&file);
 
-    out << "1," << carId << ","
+    out << session::userId << "," << carId << ","
         << oldEndDate << ","
         << newDate.toString("yyyy-MM-dd")
         << ",Pending\n";
@@ -769,8 +767,6 @@ void extensionView::on_cancelPushButton_clicked()
 {
     close();
 }
-
-
 
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -914,16 +910,22 @@ private slots:
 
 private:
     Ui::LoginWindow *ui;
+    int getNextUserId();
+    bool usernameExists(const QString &username);
 };
 #endif // LOGINWINDOW_H
-
-
 
 
 #include "LoginWindow.h"
 #include "ui_LoginWindow.h"
 #include "customerdashboard.h"
+#include "session.h"
+
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+#include <QTextStream>
+#include <QCoreApplication>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -939,35 +941,130 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::on_loginPushButton_clicked()
 {
-    QString username =
-        ui->usernameLineEdit->text();
-    QString password =
-        ui->passwordLineEdit->text();
+    QString username = ui->usernameLineEdit->text();
+    QString password = ui->passwordLineEdit->text();
 
-    if (username.isEmpty() || password.isEmpty())
-    {
-        ui->messageLabel->setText("Please fill all fields.");
+    if (username.isEmpty() || password.isEmpty()) {
+        ui->messageLabel->setText("Fill all fields");
         return;
     }
-    //فعلا فیک بعدا وصل میشه به manager
-    if (username == "test" && password == "1234")
-    {
-        QMessageBox::information(this, "Login", "Login successful");
-        customerdashboard *dashboard = new customerdashboard();
-        dashboard->show();
-        this->close();
+
+    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ui->messageLabel->setText("users file error");
+        return;
     }
-    else
-    {
-        ui->messageLabel->setText("Invalid username or password.");
+
+    QTextStream in(&file);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() != 3) continue;
+
+        if (parts[1] == username && parts[2] == password) {
+            session::userId = parts[0].toInt();
+            session::username = username;
+
+            QMessageBox::information(this, "Login", "Login successful");
+
+            customerdashboard *d = new customerdashboard();
+            d->show();
+            this->close();
+            return;
+        }
     }
+
+    ui->messageLabel->setText("Wrong username or password");
+}
+
+int LoginWindow::getNextUserId()
+{
+    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return 1;
+
+    QTextStream in(&file);
+    int lastId = 0;
+
+    while (!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+        if (parts.size() >= 1)
+            lastId = parts[0].toInt();
+    }
+
+    file.close();
+    return lastId + 1;
+}
+
+bool LoginWindow::usernameExists(const QString &username)
+{
+    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream in(&file);
+
+    while (!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split(",");
+
+        if (parts.size() >= 2 && parts[1] == username)
+        {
+            file.close();
+            return true;
+        }
+    }
+
+    file.close();
+    return false;
 }
 
 void LoginWindow::on_registerPushButton_clicked()
 {
-    QMessageBox::information(this, "Register", "Register page not implemented yet");
-}
+    QString username = ui->usernameLineEdit->text();
+    QString password = ui->passwordLineEdit->text();
 
+    if (username.isEmpty() || password.isEmpty())
+    {
+        ui->messageLabel->setText("Fill all fields");
+        return;
+    }
+
+    if (usernameExists(username))
+    {
+        ui->messageLabel->setText("Username already exists");
+        return;
+    }
+
+    int newId = getNextUserId();
+
+    QString path = QCoreApplication::applicationDirPath() + "/users.txt";
+    QFile file(path);
+
+    if (!file.open(QIODevice::Append | QIODevice::Text))
+    {
+        ui->messageLabel->setText("Error saving user");
+        return;
+    }
+
+    QTextStream out(&file);
+    out << newId << "," << username << "," << password << "\n";
+
+    file.close();
+
+    ui->messageLabel->setText("Register successful");
+}
 
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1189,7 +1286,7 @@ void LoginWindow::on_registerPushButton_clicked()
      </font>
     </property>
     <property name="text">
-     <string>Message</string>
+     <string/>
     </property>
    </widget>
   </widget>
@@ -1208,6 +1305,7 @@ void LoginWindow::on_registerPushButton_clicked()
  <resources/>
  <connections/>
 </ui>
+
 
 
 
@@ -1237,9 +1335,9 @@ private:
 #endif // MYEXTENSIONSVIEW_H
 
 
-
 #include "myextensionsview.h"
 #include "ui_myextensionsview.h"
+#include "session.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -1284,7 +1382,7 @@ void myExtensionsView::loadExtensions()
         if (parts.size() < 5)
             continue;
 
-        if (parts[0] != "1")
+        if (parts[0].toInt() != session::userId)
             continue;
 
         ui->extensionTableWidget->insertRow(row);
@@ -1439,6 +1537,8 @@ void myExtensionsView::loadExtensions()
 
 
 
+
+
     #ifndef MYRESERVATIONSVIEW_H
 #define MYRESERVATIONSVIEW_H
 
@@ -1467,10 +1567,10 @@ private:
 #endif // MYRESERVATIONSVIEW_H
 
 
-
 #include "myreservationsview.h"
 #include "ui_myreservationsview.h"
 #include "extensionview.h"
+#include "session.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -1516,7 +1616,7 @@ void myReservationsView::loadReservations()
             continue;
 
         // فقط رزروهای customer فعلی
-        if (parts[0] != "1")
+        if (parts[0].toInt() != session::userId)
             continue;
 
         ui->reservationTableWidget->insertRow(row);
@@ -1552,8 +1652,6 @@ void myReservationsView::on_extensionPushButton_clicked()
         new extensionView(carId, endDate);
     view->show();
 }
-
-
 
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1709,6 +1807,7 @@ void myReservationsView::on_extensionPushButton_clicked()
 
 
 
+
     #ifndef PAYMENTVIEW_H
 #define PAYMENTVIEW_H
 
@@ -1737,7 +1836,6 @@ private:
 };
 
 #endif // PAYMENTVIEW_H
-
 
 
 #include "paymentview.h"
@@ -1791,7 +1889,7 @@ void paymentView::loadPayments()
         if (parts.size() != 4)
             continue;
 
-        if (parts[0] != "1")
+        if (parts[0].toInt() != session::userId)
             continue;
 
         ui->paymentTableWidget->insertRow(row);
@@ -1839,7 +1937,6 @@ void paymentView::on_backPushButton_clicked()
 {
 
 }
-
 
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1972,9 +2069,7 @@ void paymentView::on_backPushButton_clicked()
 
 
 
-
-
-#ifndef RESERVATIONVIEW_H
+    #ifndef RESERVATIONVIEW_H
 #define RESERVATIONVIEW_H
 
 #include <QWidget>
@@ -2002,9 +2097,6 @@ private:
 };
 
 #endif // RESERVATIONVIEW_H
-
-
-
 
 
 #include "reservationview.h"
@@ -2129,7 +2221,7 @@ void reservationView::on_confirmPushButton_clicked()
 
     QTextStream out(&file);
 
-    out << "1," << carId << ","
+    out << session::userId << "," << carId << ","
         << start.toString("yyyy-MM-dd") << ","
         << end.toString("yyyy-MM-dd") << ",Pending\n";
 
@@ -2151,9 +2243,6 @@ void reservationView::on_cancelPushButton_clicked()
 {
 
 }
-
-
-
 
 
 
@@ -2323,3 +2412,108 @@ void reservationView::on_cancelPushButton_clicked()
  <resources/>
  <connections/>
 </ui>
+
+
+
+
+
+    #ifndef SESSION_H
+#define SESSION_H
+
+#include <QString>
+
+class session
+{
+public:
+    static int userId;
+    static QString username;
+};
+
+#endif // SESSION_H
+
+
+
+#include "session.h"
+
+int session::userId = -1;
+QString session::username = "";
+
+
+
+
+
+#ifndef USERMANAGER_H
+#define USERMANAGER_H
+
+#include <QString>
+
+class userManager
+{
+public:
+    static bool login(QString username, QString password);
+
+    static bool registerUser(QString username, QString password);
+};
+
+#endif // USERMANAGER_H
+
+
+#include "userManager.h"
+#include <QFile>
+#include <QTextStream>
+
+bool userManager::registerUser(QString username, QString password)
+{
+    QFile file("users.txt");
+
+    if(!file.open(QIODevice::ReadWrite | QIODevice::Text))
+        return false;
+
+    QTextStream in(&file);
+
+    // check if user exists
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split("|");
+
+        if(parts[0] == username)
+        {
+            file.close();
+            return false; // user exists
+        }
+    }
+
+    QTextStream out(&file);
+    out << username << "|" << password << "\n";
+
+    file.close();
+    return true;
+}
+
+bool userManager::login(QString username, QString password)
+{
+    QFile file("users.txt");
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList parts = line.split("|");
+
+        if(parts.size() >= 2 &&
+            parts[0] == username &&
+            parts[1] == password)
+        {
+            file.close();
+            return true;
+        }
+    }
+
+    file.close();
+    return false;
+}
